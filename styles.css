@@ -4,11 +4,15 @@
   --orange: #F59432;
   --blue: #34839D;
   --green: #008048;
+  --bar-width: 40px;
+  --bar-height: 4px;
+  --bar-gap: 6px;
+  --animation: 200ms ease-in-out;
+  --burger-height: calc(var(--bar-height) * 3 + var(--bar-gap) * 2);
 }
 
 img {
   max-width: 100%;
-  /* display: block; */
 }
 
 html {
@@ -21,6 +25,10 @@ body {
 }
 
 /* HEADER */
+
+.burger__menu {
+  display: none;
+}
 
 header {
   display: flex;
@@ -96,6 +104,7 @@ header li:hover {
   display: grid;
   grid-template: repeat(3, 1fr) / repeat(3, 1fr);
   gap: 1px 1px;
+  padding-bottom: 4rem;
 }
 
 .img__card {
@@ -153,11 +162,6 @@ header li:hover {
     max-width: 80%;
   }
 
-  /* .menu {
-    flex-direction: column;
-    gap: 1rem;
-  } */
-
   .hero {
     margin: 1rem auto 2rem auto;
   }
@@ -174,11 +178,6 @@ header li:hover {
 
 @media only screen and (max-width: 600px) {
 
-  /* .menu {
-    flex-direction: column;
-    gap: 1rem;
-  } */
-
   .hero {
     max-width: 90%;
   }
@@ -194,8 +193,80 @@ header li:hover {
 
 @media only screen and (max-width: 500px) {
 
+  header {
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+  }
+ 
+  .burger__menu {
+    --x-width: calc(var(--burger-height) * 1.41421356237); /* calculates the length of the lines when they become a cross (multiply by the square root of 2) */
+    position: absolute;
+    top: 22px;
+    right: 30px;  
+    display: flex;
+    flex-direction: column;
+    gap: var(--bar-gap);
+    cursor: pointer;
+    padding: .5rem;
+  }
+
+  .burger__menu input, /* checkbox. middle line */
+  .burger__menu::before, /* top line */
+  .burger__menu::after { /* bottom line */
+    content: '';
+    width: var(--bar-width);
+    height: var(--bar-height);
+    border-radius: 18px;
+    background: var(--grey);
+    transition: opacity var(--animation), /* transition for opacity, width, length and rotate */
+      width var(--animation), 
+      rotate var(--animation),
+      translate var(--animation);
+    transform-origin: left ; /* the axis where the lines rotate are now on the left */
+  }
+
+  .burger__menu input {
+    appearance: none; /* removes checkbox appareance and takes the above settings (widht, length) */
+    pointer-events: none; /* disable click on the checkbox so that the click is handled by the b_menu */
+  }
+
+  .burger__menu:has(input:checked)::before {
+    rotate: 45deg; /*rotates the top line downwards */
+    width: var(--x-width); /*sets the new length of the line when it becomes a cross */
+    translate: 0 calc(var(--bar-height) / -2); /*moves the axis slightly up */
+  }
+
+  .burger__menu:has(input:checked)::after {
+    rotate: -45deg; /* rotates the bottom line upwards */
+    width: var(--x-width); /*sets the new length of the line when it becomes a cross */
+    translate: 0 calc(var(--bar-height) / 2); /*moves the axis slightly down */
+  }
+
+  .burger__menu input:checked { /* removes the middle line */
+    opacity: 0;
+    width: 0;
+  }
+
   .menu {
+    position: absolute;
+    top: 67px;
     flex-direction: column;
     gap: 1rem;
+    transform: translateY(-150%); /* Initially hide the menu above the viewport */
+    transition: transform var(--animation); /* slides down the mwnu smootlhy */
+    opacity: 0;
+    transition: opacity var(--animation);  /* opcity transitions in */
+    padding-bottom: 1rem;
+    background: var(--orange);
+  }
+
+  .burger__menu:has(input:checked) + .menu {
+    transform: translateY(0); /* resets the setting above (-150%) */
+    opacity: 1; /* resets the setting above (0) */
+  }
+
+  header:has(.burger__menu input:checked) + main {
+    margin-top: 9rem; /* moves the content down to make space for the menu */
   }
 }
